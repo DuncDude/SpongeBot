@@ -3,6 +3,8 @@
 #November 21 2018
 # Python programed orginally designed to automate meme reply to speccified accounts
 #re purposed into basic twitter engine
+
+#if you need a libray they are down below
 from __future__ import absolute_import, print_function
 
 import time
@@ -12,6 +14,8 @@ import tweepy
 import json
 
 import os
+
+import fnmatch
 
 # == OAuth Authentication ==
 #
@@ -35,7 +39,7 @@ auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
 
 def Banner():
-
+#Prints banner and clear screen at each new page
 	os.system('cls' if os.name == 'nt' else 'clear')
 	print(" _______  _______  _______  __    _  _______  _______  _______  _______  _______   ")
 	print("|       ||       ||       ||  |  | ||       ||       ||  _    ||       ||       |  ")
@@ -49,17 +53,23 @@ def Banner():
         print("Local current time :", localtime)
 	print("___________________________________________________________________________________")
 	return
+
+
+
+
+
 def User_Name_Data():
 #user enters in a twitter handle and recives various info bits in return
 	Banner()
 	print("----------User Name Data Lookup")
 	name = raw_input("Enter ScreenName without @  symbol to get user stats: ")
-	user = api.get_user(name)
-	print("\nScreen Name: " , user.screen_name)
-	print("Name: ", user.name)
-	print("Follower Count: " , user.followers_count)
-	print("Description: ", user.description)
-	pase = raw_input("Press Enter..")
+	if name:
+		user = api.get_user(name)
+		print("\nScreen Name: " , user.screen_name)
+		print("Name: ", user.name)
+		print("Follower Count: " , user.followers_count)
+		print("Description: ", user.description)
+		pase = raw_input("Press Enter..")
 	return
 
 def Status():
@@ -79,18 +89,38 @@ def Update_Status():
 	Banner()
 	print("----------Update Status")
 	tweet = raw_input("Enter the text for a new tweet: ")
-	api.update_status(status = tweet)
-	print("Success!")
-	pase = raw_input("Press Enter..")
+	#check to make sure there is a status written
+	if tweet:
+		api.update_status(status = tweet)
+		print("Success!")
+		pase = raw_input("Press Enter..")
+	else:
+		return
 	return
-
 def Update_Status_withMedia():
 #user posts a picture
 	Banner()
 	print("----------Update Status with Media ")
-	img = raw_input("Enter name of image file  i.e, spongebob.jpeg: ")
-	status = raw_input("Enter the text for a new tweet: ")
-	api.update_with_media(img, status)
+	#list jpeg files in working directory
+	print("JPEG files: ")
+	listOfFiles = os.listdir('.')
+	pattern = "*.jpeg"
+	for entry in listOfFiles:
+		if fnmatch.fnmatch(entry, pattern):
+			print(entry)
+	
+	img = raw_input("Enter name of image file  i.e, spongebob.jpeg or leave empty for no image: ")
+	tweet = raw_input("Enter the text for a new tweet: ")
+	#check to see if tweet does infact have an image
+	if img:
+		api.update_with_media(img, tweet)
+	else:
+		if tweet:
+                	api.update_status(tweet)
+                	print("Success!")
+                	pase = raw_input("Press Enter..")
+	        else:
+			return
 	print("Success!")
 	pase = raw_input("Press Enter..")
 	return
@@ -112,14 +142,14 @@ def SpongeBot():
 			if i % 2:
 				orginal[i] = ele.upper()
 		remix = "".join(orginal)
-		Fremix = "\n America: " + remix
+		Fremix = "\nAmerica: " + remix
 		final = newO + Fremix
 		#shorten to 280 characters
 		final = final[:280]
 		print(final)
 		#upload new status
 		img = 'spongebob.jpeg'
-		api.update_with_media(img, status = final)
+		api.update_with_media(img, status = final, )
 		pase = raw_input("Press Enter..")
         	return
 
@@ -129,7 +159,10 @@ def SpongeBot_auto():
 	print("----------SpongeBot Auto")
 	print("PRESS CTRL + C TO STOP BOT")
         name = raw_input("\nEnter ScreenName without @  symbol to get mock tweet: ")
-        delay = raw_input("Enter the frequency in seconds to check for status updates: ")
+        delay = raw_input("Enter the frequency in minutes to check for status updates: ")
+	delay = float(delay)
+	delay = delay * 60
+	mocker = raw_input("Enter name you want to mock tweet i.e, America: ")
 	orginal = "a"
 	last_tweet = " "
 	try:
@@ -146,24 +179,24 @@ def SpongeBot_auto():
         		        	        if i % 2:
         		        	                orginal[i] = ele.upper()
         		        	remix = "".join(orginal)
-        		        	Fremix = "\nAmerica: " + remix
+        		        	Fremix = "\n" + mocker + ": " + remix
         		        	final = newO + Fremix
         		        	#shorten to 280 characters
         		        	final = final[:260]
         		        	print(final)
         		        	#upload new status
         		        	img = 'spongebob.jpeg'
-        		        	api.update_with_media(img, status = final)
+        		        	api.update_with_media(img, status = final, in_reply_to_status_id = status.id, auto_populate_reply_metadata = True)
 
 					localtime = time.asctime( time.localtime(time.time()) )
 					print("Tweet successfully posted : ", localtime)
-	        	        	time.sleep(float(delay))
+	        	        	time.sleep(delay)
 				else:
 					localtime = time.asctime( time.localtime(time.time()) )
 					print("No new posts at :", name  ,localtime)
-					time.sleep(float(delay))
+					time.sleep(delay)
 	except KeyboardInterrupt:
-		pase = raw_input("Press Enter..")
+		pase = raw_input("\nPress Enter..")
  		pass
 #Prints out home screen proving theconnecton
 def Home():
@@ -178,6 +211,8 @@ def Home():
 	print("5. SpongeBot")
 	print("6. SpongeBot Auto Mode")
 	choice = input("Enter number for choice: ")
+	if choice == "":
+		Home()
 	if choice == 1:
 		User_Name_Data()
 	if choice == 2:
@@ -192,5 +227,6 @@ def Home():
 		SpongeBot_auto()
 	else:
 		print("ERROR")
+		Home()
 	Home()
 Home()
