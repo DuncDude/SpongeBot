@@ -24,19 +24,27 @@ import fnmatch
 
 # The consumer keys can be found on your application's Details
 # page located at https://dev.twitter.com/apps (under "OAuth settings")
-consumer_key="BD1oRgI2DISmQQsq3V0dbnUrd"
-consumer_secret="adgVdhqmYeR36eaZ1Zupx0jVZ7KeAAPrkeVvESaSrbRO5yoxmc"
+consumer_key="dQ1VQlahRFRRLkD0H4m2AeZt7"
+consumer_secret="nBpnnV8z9AxJd0FKYneSFGyV3Hw1cGQIM0mE5GCL1XjrrxnD7q"
 
 # The access tokens can be found on your applications's Details
 # page located at https://dev.twitter.com/apps (located
 # under "Your access token")
-access_token="1063273560867856384-I0o2KwuFmZnAgwQFlGU4kLM81MdnkS"
-access_token_secret="xvnx7PoifMfyL3V8uZh0tJ1N9edUEDUmAvQcCAVkoICVY"
+access_token="1063273560867856384-lozc6C87aGrVycu884Dr0tX2L5bnA1"
+access_token_secret="c4bJup0XVKchv4dTEzGFm1T9tYwAS908mXcuX4gqDHwBW"
 
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
-
 api = tweepy.API(auth)
+
+
+def Log_in():
+	global auth 
+	global api
+        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+        auth.set_access_token(access_token, access_token_secret)
+        api = tweepy.API(auth)
+	Home()
 
 def Banner():
 #Prints banner and clear screen at each new page
@@ -54,8 +62,18 @@ def Banner():
 	print("___________________________________________________________________________________")
 	return
 
-
-
+def Keys():
+	Banner()
+        global consumer_key 
+        global consumer_secret
+        global access_token
+        global access_token_secret
+        consumer_key = raw_input("Enter consumer key: ")
+        consumer_secret = raw_input("Enter consumer secret: ")
+        access_token = raw_input("Enter access token: ")
+        access_token_secret = raw_input("Enter access token secret: ")
+	pase = raw_input("Press Enter..")
+	Log_in()
 
 
 def User_Name_Data():
@@ -133,8 +151,9 @@ def SpongeBot():
         orginal = " "
 	#get user status and capitalize each other letter
 	twiz = api.user_timeline(name, count = 1, page = 1, include_rts = False)
-        for status in twiz:
+	for status in twiz:
                 orginal = status.text
+		orginal = orginal.lower()
 		newO = name + ": " + status.text
 		orginal = list(orginal)
 	#Rearrange letters capitalizing all other chars
@@ -145,7 +164,7 @@ def SpongeBot():
 		Fremix = "\nAmerica: " + remix
 		final = newO + Fremix
 		#shorten to 280 characters
-		final = final[:280]
+		final = final[:270]
 		print(final)
 		#upload new status
 		img = 'spongebob.jpeg'
@@ -171,6 +190,7 @@ def SpongeBot_auto():
         		twiz = api.user_timeline(name, count = 1, page = 1, include_rts = False)
         		for status in twiz:
         		        orginal = status.text
+				orginal = orginal.lower()
 				if orginal != last_tweet:
 					last_tweet = orginal
         		        	newO = name + ": " + status.text
@@ -182,7 +202,7 @@ def SpongeBot_auto():
         		        	Fremix = "\n" + mocker + ": " + remix
         		        	final = newO + Fremix
         		        	#shorten to 280 characters
-        		        	final = final[:260]
+        		        	final = final[:270]
         		        	print(final)
         		        	#upload new status
         		        	img = 'spongebob.jpeg'
@@ -210,6 +230,7 @@ def Home():
 	print("4. Tweet with Media")
 	print("5. SpongeBot")
 	print("6. SpongeBot Auto Mode")
+	print("7. Change Twitter account")
 	choice = input("Enter number for choice: ")
 	if choice == "":
 		Home()
@@ -225,6 +246,8 @@ def Home():
 		SpongeBot()
 	if choice == 6:
 		SpongeBot_auto()
+	if choice == 7:
+		Keys()
 	else:
 		print("ERROR")
 		Home()
