@@ -1,0 +1,196 @@
+#SpongeBot v2.0
+#designed By Duncan Andrews
+#November 21 2018
+# Python programed orginally designed to automate meme reply to speccified accounts
+#re purposed into basic twitter engine
+from __future__ import absolute_import, print_function
+
+import time
+
+import tweepy
+
+import json
+
+import os
+
+# == OAuth Authentication ==
+#
+# This mode of authentication is the new preferred way
+# of authenticating with Twitter.
+
+# The consumer keys can be found on your application's Details
+# page located at https://dev.twitter.com/apps (under "OAuth settings")
+consumer_key="BD1oRgI2DISmQQsq3V0dbnUrd"
+consumer_secret="adgVdhqmYeR36eaZ1Zupx0jVZ7KeAAPrkeVvESaSrbRO5yoxmc"
+
+# The access tokens can be found on your applications's Details
+# page located at https://dev.twitter.com/apps (located
+# under "Your access token")
+access_token="1063273560867856384-I0o2KwuFmZnAgwQFlGU4kLM81MdnkS"
+access_token_secret="xvnx7PoifMfyL3V8uZh0tJ1N9edUEDUmAvQcCAVkoICVY"
+
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
+
+api = tweepy.API(auth)
+
+def Banner():
+
+	os.system('cls' if os.name == 'nt' else 'clear')
+	print(" _______  _______  _______  __    _  _______  _______  _______  _______  _______   ")
+	print("|       ||       ||       ||  |  | ||       ||       ||  _    ||       ||       |  ")
+	print("|  _____||    _  ||   _   ||   |_| ||    ___||    ___|| |_|   ||   _   ||_     _|  ")
+	print("| |_____ |   |_| ||  | |  ||       ||   | __ |   |___ |       ||  | |  |  |   |    ")
+	print("|_____  ||    ___||  |_|  ||  _    ||   ||  ||    ___||  _   | |  |_|  |  |   |    ")
+	print(" _____| ||   |    |       || | |   ||   |_| ||   |___ | |_|   ||       |  |   |    ")
+	print("|_______||___|    |_______||_|  |__||_______||_______||_______||_______|  |___|    ")
+	print("___________________________________________________________________________________")
+	localtime = time.asctime( time.localtime(time.time()) )
+        print("Local current time :", localtime)
+	print("___________________________________________________________________________________")
+	return
+def User_Name_Data():
+#user enters in a twitter handle and recives various info bits in return
+	Banner()
+	print("----------User Name Data Lookup")
+	name = raw_input("Enter ScreenName without @  symbol to get user stats: ")
+	user = api.get_user(name)
+	print("\nScreen Name: " , user.screen_name)
+	print("Name: ", user.name)
+	print("Follower Count: " , user.followers_count)
+	print("Description: ", user.description)
+	pase = raw_input("Press Enter..")
+	return
+
+def Status():
+# user enters in a twitter handle and recives the last know tweet and the tweet id
+	Banner()
+	print("----------Status")
+	name = raw_input("Enter ScreenName without @  symbol to get newsest tweet: ")
+	twiz = api.user_timeline(name, count = 1, page = 1, include_rts = False)
+	for status in twiz:
+		print("\nLast tweet", status.text)
+		print("id: ", status.id)
+	pase = raw_input("Press Enter..")
+	return
+
+def Update_Status():
+# user posts a new tweet
+	Banner()
+	print("----------Update Status")
+	tweet = raw_input("Enter the text for a new tweet: ")
+	api.update_status(status = tweet)
+	print("Success!")
+	pase = raw_input("Press Enter..")
+	return
+
+def Update_Status_withMedia():
+#user posts a picture
+	Banner()
+	print("----------Update Status with Media ")
+	img = raw_input("Enter name of image file  i.e, spongebob.jpeg: ")
+	status = raw_input("Enter the text for a new tweet: ")
+	api.update_with_media(img, status)
+	print("Success!")
+	pase = raw_input("Press Enter..")
+	return
+
+def SpongeBot():
+	Banner()
+#User enters a user handle, rearanges last tweet into mocking spongebob meme
+	print("----------SpongeBot")
+        name = raw_input("Enter ScreenName without @  symbol to get mock tweet: ")
+        orginal = " "
+	#get user status and capitalize each other letter
+	twiz = api.user_timeline(name, count = 1, page = 1, include_rts = False)
+        for status in twiz:
+                orginal = status.text
+		newO = name + ": " + status.text
+		orginal = list(orginal)
+	#Rearrange letters capitalizing all other chars
+		for i, ele in enumerate(orginal):
+			if i % 2:
+				orginal[i] = ele.upper()
+		remix = "".join(orginal)
+		Fremix = "\n America: " + remix
+		final = newO + Fremix
+		#shorten to 280 characters
+		final = final[:280]
+		print(final)
+		#upload new status
+		img = 'spongebob.jpeg'
+		api.update_with_media(img, status = final)
+		pase = raw_input("Press Enter..")
+        	return
+
+def SpongeBot_auto():
+	Banner()
+#AutoMatic SpongeBot Posting based on time
+	print("----------SpongeBot Auto")
+	print("PRESS CTRL + C TO STOP BOT")
+        name = raw_input("\nEnter ScreenName without @  symbol to get mock tweet: ")
+        delay = raw_input("Enter the frequency in seconds to check for status updates: ")
+	orginal = "a"
+	last_tweet = " "
+	try:
+		while True:
+        	#get user status and capitalize each other letter basiclly refomating the tweet
+        		twiz = api.user_timeline(name, count = 1, page = 1, include_rts = False)
+        		for status in twiz:
+        		        orginal = status.text
+				if orginal != last_tweet:
+					last_tweet = orginal
+        		        	newO = name + ": " + status.text
+        		        	orginal = list(orginal)
+        		        	for i, ele in enumerate(orginal):
+        		        	        if i % 2:
+        		        	                orginal[i] = ele.upper()
+        		        	remix = "".join(orginal)
+        		        	Fremix = "\nAmerica: " + remix
+        		        	final = newO + Fremix
+        		        	#shorten to 280 characters
+        		        	final = final[:260]
+        		        	print(final)
+        		        	#upload new status
+        		        	img = 'spongebob.jpeg'
+        		        	api.update_with_media(img, status = final)
+
+					localtime = time.asctime( time.localtime(time.time()) )
+					print("Tweet successfully posted : ", localtime)
+	        	        	time.sleep(float(delay))
+				else:
+					localtime = time.asctime( time.localtime(time.time()) )
+					print("No new posts at :", name  ,localtime)
+					time.sleep(float(delay))
+	except KeyboardInterrupt:
+		pase = raw_input("Press Enter..")
+ 		pass
+#Prints out home screen proving theconnecton
+def Home():
+	Banner()
+	print("----------Home")
+	UserName= api.me().name
+	print("Welcome Back: " + UserName)
+	print("1. Get a users  data")
+	print("2. Get a users last tweet")
+	print("3. Tweet a new status")
+	print("4. Tweet with Media")
+	print("5. SpongeBot")
+	print("6. SpongeBot Auto Mode")
+	choice = input("Enter number for choice: ")
+	if choice == 1:
+		User_Name_Data()
+	if choice == 2:
+		Status()
+	if choice == 3:
+		Update_Status()
+	if choice == 4:
+		Update_Status_withMedia()
+	if choice == 5:
+		SpongeBot()
+	if choice == 6:
+		SpongeBot_auto()
+	else:
+		print("ERROR")
+	Home()
+Home()
