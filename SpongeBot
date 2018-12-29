@@ -24,19 +24,28 @@ import fnmatch
 
 # The consumer keys can be found on your application's Details
 # page located at https://dev.twitter.com/apps (under "OAuth settings")
-consumer_key="dQ1VQlahRFRRLkD0H4m2AeZt7"
-consumer_secret="nBpnnV8z9AxJd0FKYneSFGyV3Hw1cGQIM0mE5GCL1XjrrxnD7q"
+consumer_key=""
+consumer_secret=""
 
 # The access tokens can be found on your applications's Details
 # page located at https://dev.twitter.com/apps (located
 # under "Your access token")
-access_token="1063273560867856384-lozc6C87aGrVycu884Dr0tX2L5bnA1"
-access_token_secret="c4bJup0XVKchv4dTEzGFm1T9tYwAS908mXcuX4gqDHwBW"
+access_token=""
+access_token_secret=""
 
-auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-auth.set_access_token(access_token, access_token_secret)
-api = tweepy.API(auth)
 
+#intial login and creation pf api object
+try:
+	auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+	auth.set_access_token(access_token, access_token_secret)
+	api = tweepy.API(auth)
+except:
+	pass
+
+def pause():
+#pause function to wait for Enter
+	pase = raw_input("Press Enter..")
+	return
 
 def Log_in():
 	global auth 
@@ -48,6 +57,7 @@ def Log_in():
 
 def Banner():
 #Prints banner and clear screen at each new page
+	#clear screen
 	os.system('cls' if os.name == 'nt' else 'clear')
 	print(" _______  _______  _______  __    _  _______  _______  _______  _______  _______   ")
 	print("|       ||       ||       ||  |  | ||       ||       ||  _    ||       ||       |  ")
@@ -72,7 +82,7 @@ def Keys():
         consumer_secret = raw_input("Enter consumer secret: ")
         access_token = raw_input("Enter access token: ")
         access_token_secret = raw_input("Enter access token secret: ")
-	pase = raw_input("Press Enter..")
+	pause()
 	Log_in()
 
 
@@ -82,12 +92,15 @@ def User_Name_Data():
 	print("----------User Name Data Lookup")
 	name = raw_input("Enter ScreenName without @  symbol to get user stats: ")
 	if name:
-		user = api.get_user(name)
-		print("\nScreen Name: " , user.screen_name)
-		print("Name: ", user.name)
-		print("Follower Count: " , user.followers_count)
-		print("Description: ", user.description)
-		pase = raw_input("Press Enter..")
+		try:
+			user = api.get_user(name)
+			print("\nScreen Name: " , user.screen_name)
+			print("Name: ", user.name)
+			print("Follower Count: " , user.followers_count)
+			print("Description: ", user.description)
+			pause()
+		except:
+			return
 	return
 
 def Status():
@@ -95,11 +108,14 @@ def Status():
 	Banner()
 	print("----------Status")
 	name = raw_input("Enter ScreenName without @  symbol to get newsest tweet: ")
-	twiz = api.user_timeline(name, count = 1, page = 1, include_rts = False)
-	for status in twiz:
-		print("\nLast tweet", status.text)
-		print("id: ", status.id)
-	pase = raw_input("Press Enter..")
+	try:
+		twiz = api.user_timeline(name, count = 1, page = 1, include_rts = False)
+		for status in twiz:
+			print("\nLast tweet", status.text)
+			print("id: ", status.id)
+	except:
+		return
+	pause()
 	return
 
 def Update_Status():
@@ -109,9 +125,12 @@ def Update_Status():
 	tweet = raw_input("Enter the text for a new tweet: ")
 	#check to make sure there is a status written
 	if tweet:
-		api.update_status(status = tweet)
-		print("Success!")
-		pase = raw_input("Press Enter..")
+		try:
+			api.update_status(status = tweet)
+			print("Success!")
+			pause()
+		except:
+			return
 	else:
 		return
 	return
@@ -123,24 +142,33 @@ def Update_Status_withMedia():
 	print("JPEG files: ")
 	listOfFiles = os.listdir('.')
 	pattern = "*.jpeg"
+	pattern2 = "*.gif"
+	pattern3 = "*.png"
 	for entry in listOfFiles:
 		if fnmatch.fnmatch(entry, pattern):
 			print(entry)
+		if fnmatch.fnmatch(entry, pattern2):
+                        print(entry)
+		if fnmatch.fnmatch(entry, pattern3):
+                        print(entry)
+
 	
-	img = raw_input("Enter name of image file  i.e, spongebob.jpeg or leave empty for no image: ")
+	img = raw_input("\nEnter name of image file  i.e, spongebob.jpeg or leave empty for no image: ")
 	tweet = raw_input("Enter the text for a new tweet: ")
 	#check to see if tweet does infact have an image
 	if img:
-		api.update_with_media(img, tweet)
+		try:
+			api.update_with_media(img, tweet)
+		except:
+			return
 	else:
 		if tweet:
-                	api.update_status(tweet)
-                	print("Success!")
-                	pase = raw_input("Press Enter..")
-	        else:
-			return
+			try:
+                		api.update_status(tweet)
+        		except:
+				return
 	print("Success!")
-	pase = raw_input("Press Enter..")
+	pause()
 	return
 
 def SpongeBot():
@@ -150,7 +178,10 @@ def SpongeBot():
         name = raw_input("Enter ScreenName without @  symbol to get mock tweet: ")
         orginal = " "
 	#get user status and capitalize each other letter
-	twiz = api.user_timeline(name, count = 1, page = 1, include_rts = False)
+	try:
+		twiz = api.user_timeline(name, count = 1, page = 1, include_rts = False)
+	except:
+		return
 	for status in twiz:
                 orginal = status.text
 		orginal = orginal.lower()
@@ -207,7 +238,8 @@ def SpongeBot_auto():
         		        	#upload new status
         		        	img = 'spongebob.jpeg'
         		        	api.update_with_media(img, status = final, in_reply_to_status_id = status.id, auto_populate_reply_metadata = True)
-
+					#attempt to update status by its self (changed/added Dec28th)
+					api.update_with_media(img, status = final, )
 					localtime = time.asctime( time.localtime(time.time()) )
 					print("Tweet successfully posted : ", localtime)
 	        	        	time.sleep(delay)
@@ -216,13 +248,16 @@ def SpongeBot_auto():
 					print("No new posts at :", name  ,localtime)
 					time.sleep(delay)
 	except KeyboardInterrupt:
-		pase = raw_input("\nPress Enter..")
+		pause()
  		pass
 #Prints out home screen proving theconnecton
 def Home():
 	Banner()
 	print("----------Home")
-	UserName= api.me().name
+	try:
+		UserName= api.me().name
+	except:
+		UserName="NOT LOGGED IN"
 	print("Welcome Back: " + UserName)
 	print("1. Get a users  data")
 	print("2. Get a users last tweet")
@@ -230,26 +265,29 @@ def Home():
 	print("4. Tweet with Media")
 	print("5. SpongeBot")
 	print("6. SpongeBot Auto Mode")
-	print("7. Change Twitter account")
+	print("7. Log in or Change Twitter account")
 	choice = input("Enter number for choice: ")
-	if choice == "":
-		Home()
-	if choice == 1:
-		User_Name_Data()
-	if choice == 2:
-		Status()
-	if choice == 3:
-		Update_Status()
-	if choice == 4:
-		Update_Status_withMedia()
-	if choice == 5:
-		SpongeBot()
-	if choice == 6:
-		SpongeBot_auto()
-	if choice == 7:
-		Keys()
+	if choice:
+		if choice == "":
+			Home()
+		if choice == 1:
+			User_Name_Data()
+		if choice == 2:
+			Status()
+		if choice == 3:
+			Update_Status()
+		if choice == 4:
+			Update_Status_withMedia()
+		if choice == 5:
+			SpongeBot()
+		if choice == 6:
+			SpongeBot_auto()
+		if choice == 7:
+			Keys()
+		else:
+			print("ERROR")
+			Home()
 	else:
-		print("ERROR")
 		Home()
 	Home()
 Home()
