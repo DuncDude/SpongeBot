@@ -1,5 +1,5 @@
 # SpongeBot
-SpongeBot
+
 Intro: 
 This is a CLI twitter interface with basic options such as looking up accounts posting pictures and making new tweets, there is also a dedicated function which auto spams the spongebob meme on accounts you specify it.
 
