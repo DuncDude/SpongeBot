@@ -1,10 +1,11 @@
-#SpongeBot v2.0
+#SpongeBot v5.0
 #designed By Duncan Andrews
-#November 21 2018
+#December 28 2018
 # Python programed orginally designed to automate meme reply to speccified accounts
 #re purposed into basic twitter engine
 
 #if you need a libray they are down below
+
 from __future__ import absolute_import, print_function
 
 import time
@@ -16,6 +17,7 @@ import json
 import os
 
 import fnmatch
+
 
 # == OAuth Authentication ==
 #
@@ -127,7 +129,7 @@ def Update_Status():
 	if tweet:
 		try:
 			api.update_status(status = tweet)
-			print("Success!")
+			print("Tweet successfully posted!")
 			pause()
 		except:
 			return
@@ -167,7 +169,7 @@ def Update_Status_withMedia():
                 		api.update_status(tweet)
         		except:
 				return
-	print("Success!")
+	print("Tweet successfully posted!")
 	pause()
 	return
 
@@ -199,10 +201,16 @@ def SpongeBot():
 		print(final)
 		#upload new status
 		img = 'spongebob.jpeg'
-		api.update_with_media(img, status = final, )
-		pase = raw_input("Press Enter..")
-        	return
-
+		try:
+			api.update_with_media(img, status = final, )
+			api.update_with_media(img, status = final, in_reply_to_status_id = status.id, auto_populate_reply_metadata = True)
+			print("Tweet successfully posted!")
+			pase = raw_input("Press Enter..")
+			return
+		except:
+			print("Something went wrong")
+			pause()
+			return
 def SpongeBot_auto():
 	Banner()
 #AutoMatic SpongeBot Posting based on time
